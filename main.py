@@ -23,7 +23,7 @@ users: dict = {}
 
 # Функция возвращающая случайное целое число от 1 до 100
 def get_random_number() -> int:
-    return random.randint(1, 5)
+    return random.randint(1, 100)
 
 
 # Хендлер для команды /start

@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+
+  api:
+    image: rgazizulin/telegram_bot:$GITHUB_REF_NAME-$GITHUB_RUN_ID
+    restart: always
+
+

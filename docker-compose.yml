@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  api:
+    image: rgazizulin/telegram_bot:latest
+    restart: always
+
+
+

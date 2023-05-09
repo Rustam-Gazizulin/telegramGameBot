@@ -1,0 +1,45 @@
+name: Build and deploy workflow
+on: [push]
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: clone code
+        uses: actions/checkout@v2
+      - name: docker build
+        run: docker build -t rgazizulin/telegram_bot:$GITHUB_REF_NAME-$GITHUB_RUN_ID .
+      - name: docker login
+        run: echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      - name: docker push
+        run: docker push rgazizulin/telegram_bot:$GITHUB_REF_NAME-$GITHUB_RUN_ID
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push
+
+
+    steps:
+      - name: clone code
+        uses: actions/checkout@v2
+      - name: render configs
+        run: |
+          mkdir deploy
+          cat docker-compose-ci.yml | envsubst > deploy/docker-compose.yml
+      - name: copy files to server
+        uses: appleboy/scp-action@master
+        with:
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          source: "deploy/docker-compose.yml"
+          target: "telegram_bot"
+          strip_components: 1
+      - name: deploy app
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            cd telegram_bot
+            echo ${{ secrets.PASSWORD }} | sudo -S docker-compose down
+            echo ${{ secrets.PASSWORD }} | sudo -S docker-compose up -d
+        
+
