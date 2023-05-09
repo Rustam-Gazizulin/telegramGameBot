@@ -27,3 +27,6 @@ def get_list_valute() -> list:
     return list_valute
 
 
+# Функция интересный факт о числе
+def get_fact_number(x: int) -> str:
+    response = requests.get('http://numbersapi.com/x/math').json()['Valute']
