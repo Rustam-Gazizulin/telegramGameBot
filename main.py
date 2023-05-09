@@ -1,8 +1,9 @@
 import random
-
-from aiogram import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher
 from aiogram.filters import Command, Text
 from aiogram.types import Message
+
+from list_valute import get_list_valute, convert_to_rub
 
 API_TOKEN: str = '5976510239:AAE_GAdpynTlNEHbJNtdIroDDjRzXwl_8xY'
 
@@ -16,6 +17,7 @@ ATTEMPTS: int = 7
 # Словарь, в котором будут храниться данные пользователя
 users: dict = {}
 
+money: dict = {}
 
 # Функция возвращающая случайное целое число от 1 до 100
 def get_random_number() -> int:
@@ -98,6 +100,8 @@ async def process_numbers_answer(message: Message):
         if int(message.text) == users[message.from_user.id]['secret_number']:
             await message.answer("Ура вы угадали число!\n\n"
                                  "Может еще партию?")
+            await message.answer("А еще я знаю интересный факт об этом числе)")
+
             users[message.from_user.id]['in_game'] = False
             users[message.from_user.id]['wins'] += 1
             users[message.from_user.id]['total_games'] += 1
@@ -114,6 +118,20 @@ async def process_numbers_answer(message: Message):
             users[message.from_user.id]['total_games'] += 1
     else:
         await message.answer("Мы еще не начали играть, хотите сыграть?")
+
+
+# Хендлер для команды /valute
+@dp.message(Command(commands=['valute']))
+async def process_convert_valute(message: Message):
+    await message.answer(f'Напишите тикер валюты которая вам требуется для конвертации в рубли\n'
+                         f'Тикер состоит из трех латинских букв например USD, EUR и т.д.')
+    money[message.text] = 0
+
+
+@dp.message(Text(text=get_list_valute()))
+async def count_valute(message: Message):
+
+    await message.answer(convert_to_rub(message.text, 1))
 
 
 # Хендлер обрабатывающий прочие запросы
@@ -137,6 +155,10 @@ async def process_other_text_answer(message: Message):
     elif users[message.from_user.id]['in_game']:
         await message.answer("Мы же сейчас играем в цифры\n"
                              "Присылайте пожалуйста числа от 1 до 100")
+
+
+
+
 
 
 if __name__ == '__main__':
