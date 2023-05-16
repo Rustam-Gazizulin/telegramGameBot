@@ -1,13 +1,16 @@
 import random
-
+import os
 import requests
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command, Text
 from aiogram.types import Message
+from dotenv import load_dotenv
 
 from list_valute import get_list_valute, convert_to_rub
 
-API_TOKEN: str = '5976510239:AAE_GAdpynTlNEHbJNtdIroDDjRzXwl_8xY'
+load_dotenv()
+
+API_TOKEN = os.getenv('TOKEN_BOT')
 
 API_URL_NUMBER = 'http://numbersapi.com'
 # Создаем объекты бота и диспетчера
